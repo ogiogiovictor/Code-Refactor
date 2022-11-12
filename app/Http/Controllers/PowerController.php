@@ -25,6 +25,7 @@ use Symfony\Component\HttpFoundation\Response;
 use App\Http\Requests\ValidateMeterRequest;
 use App\Services\ServiceSetting;
 use App\Services\VendorDeduction;
+use App\Services\BuyUnits;
 use App\Model\Meter;
 
 
@@ -45,8 +46,10 @@ class PowerController extends ApiController
         $chargeVendor = (new VendorDeduction())->chargeVendor($request,  $provider) 
 
         # Make the Payment Switch
-        $paymentSwitch = $this->switchPayment($request, $provider->api_provider, $referenceId, $checkClientAPIKey['testing_api']);
-
+        if($checkClientAPIKey['valid']){
+            $paymentSwitch = $this->switchPayment($request, $provider->api_provider, $referenceId, $checkClientAPIKey['testing_api']);
+        }
+       
         #Save to Meter Table depending on condition
         $saveMeter = Meter::storeMeter($paymentSwitch);
 
@@ -60,7 +63,7 @@ class PowerController extends ApiController
 
 
 
-    private function storepowerTransaction($checkClientAPIKey, $response, $request, $chargeVendor,  $referenceId, $provider){
+    private function storepowerTransaction($checkClientAPIKey, $response, $request, $chargeVendor,  $referenceId, $provider, $saveMeter){
         $transaction_message = 'Transaction Ready';
         // create accessoken to validate error
         $access_token = NULL;
@@ -122,11 +125,12 @@ class PowerController extends ApiController
           /*if the invinsible payment method is available*/
           if ($request->payment_method != "" && $request->payment_method == "wallet" &&  auth()->user()->wallet->balance < $powerTransaction->amount_paid) {
             $pay_method = "wallet";
-            return $this->buyUnits($request, $pay_method);
+            return (new BuyUnits())->buyUnits($powerTransaction, $pay_method, $request);
+            //return $this->buyUnits($request, $pay_method);
              }
 
-             return $this->showMessage($data, Response::HTTP_OK); //200
-    }
+         return $this->showMessage($data, Response::HTTP_OK); //200
+}
 
 
 

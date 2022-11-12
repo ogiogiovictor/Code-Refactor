@@ -19,11 +19,11 @@ class ServiceSetting extends ApiController
 
          /*calculate amount to be deducted for vendor*/
          if ($AuthUser->role->name == 'vendor') { 
-            $role = auth()->user()->role->id;
+            $role = $AuthUser->role->id;
             $amountPaid = $deductCommission;
             $service_charge = 0;
             $service_commission = $percentageToDeduct;
-            $user = auth()->user()->id ? auth()->user()->id : "NULL";
+            $user = a$AuthUser->id ? $AuthUser->id : "NULL";
          }else{
             $amountPaid = $request->amount + $provider->service_charge;
             $service_charge = $provider->service_charge;

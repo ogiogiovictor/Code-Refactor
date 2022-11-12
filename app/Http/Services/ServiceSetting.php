@@ -20,6 +20,7 @@ use App\Services\ConfirmMeter;
 class ServiceSetting extends ApiController
 {
   
+    #Validate provider service
    public function validateProvider($code, $mode, $amount, $promin, $promax){
         $provider = ServiceSetting::where('code', $code)->where('mode', $mode)->first();
        
@@ -36,10 +37,11 @@ class ServiceSetting extends ApiController
    }
 
 
-  #Check client API key
+   #Check client API key
     public function checkClientAPIKey($request,  $referenceId, $faker) {
         $AuthUser = auth()->user();
-        #I already know the user is authenticated from the route not check to be checking in the condition
+
+        #I already know the user is authenticated from the route middleware
         if($request->devkey && $AuthUser->activate_client_api == "yes"){ 
             //$referenceId = mt_rand(1000000000, mt_getrandmax());
             if ($AuthUser->client_api_mode == "test" && $AuthUser->devkey->test_key === $request->devkey){
@@ -55,18 +57,17 @@ class ServiceSetting extends ApiController
                 $platform = 'API LIVE';
                 $title = 'API Live Client ' . $request->disco . ' ' . $request->amount . " to " . $request->meter;
             }else {
-                return $this->errorResponse('Oh sorry!! Somthing is wrong here in LVRA. Check your key or kindly contact support for assistance for support',  Response::HTTP_UNAUTHORIZED);
+                return $this->errorResponse('Invalid key authorization.', Response::HTTP_UNAUTHORIZED); //401
+               // return $this->errorResponse('Oh sorry!! Somthing is wrong here in LVRA. Check your key or kindly contact support for assistance for support',  Response::HTTP_UNAUTHORIZED);
             }
 
-            return [
-                'testing_api' => $testing_api,
-                'title' => $title,
-            ];
+            return ['testing_api' => $testing_api, 'title' => $title, 'valid' => 'continue'];
 
         }else {
             return $this->errorResponse('Invalid authorization. Please contact support for assistance.', Response::HTTP_UNAUTHORIZED);
         }
     }
+
 
 
     public function checkAPIType($request, $paymentMethod){
