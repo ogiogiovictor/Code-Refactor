@@ -22,6 +22,9 @@ We are leveraging this to know how best you can work with us at @Tonote on the b
 ## To get a local copy up and running follow these simple example steps.
 - Clone the Repo @ https://github.com/ogiogiovictor/Code-Refactor.git
 - Open the PostController to see the implementation
+- Make sure you open the pull request to see my comment @ https://github.com/ogiogiovictor/Code-Refactor/pull/1
+- Switch to the feature branch and download from it since i am yet to merge to main develop
+- Once i get your comment and recommendation it can be re-implemented and merged.
 
 ```
 
